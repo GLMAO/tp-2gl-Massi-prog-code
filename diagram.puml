@@ -1,0 +1,144 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FEFEFE
+
+' Pattern Builder
+class Cours {
+  - matiere: String
+  - enseignant: String
+  - salle: String
+  - date: String
+  - heureDebut: String
+  - estOptionnel: boolean
+  - niveau: String
+  - necessiteProjecteur: boolean
+  + Cours(...)
+  + getDescription(): String
+  + getDuree(): double
+  + getMatiere(): String
+  + getEnseignant(): String
+}
+
+class CoursBuilder {
+  - matiere: String
+  - enseignant: String
+  - salle: String
+  - date: String
+  - heureDebut: String
+  - estOptionnel: boolean
+  - niveau: String
+  - necessiteProjecteur: boolean
+  + setMatiere(String): CoursBuilder
+  + setEnseignant(String): CoursBuilder
+  + setSalle(String): CoursBuilder
+  + setDate(String): CoursBuilder
+  + setHeureDebut(String): CoursBuilder
+  + setEstOptionnel(boolean): CoursBuilder
+  + setNiveau(String): CoursBuilder
+  + setNecessiteProjecteur(boolean): CoursBuilder
+  + build(): Cours
+}
+
+' Interface ICours
+interface ICours {
+  + getDescription(): String
+  + getDuree(): double
+}
+
+' Pattern Decorator
+abstract class CoursDecorator {
+  # coursDecorated: ICours
+  + CoursDecorator(ICours)
+  + getDescription(): String
+  + getDuree(): double
+}
+
+class CoursEnLigne {
+  + CoursEnLigne(ICours)
+  + getDescription(): String
+  + getDuree(): double
+}
+
+class CoursEnAnglais {
+  + CoursEnAnglais(ICours)
+  + getDescription(): String
+  + getDuree(): double
+}
+
+class CoursMagistral {
+  + CoursMagistral(ICours)
+  + getDescription(): String
+  + getDuree(): double
+}
+
+' Pattern Observer
+interface Subject {
+  + attach(Observer): void
+  + detach(Observer): void
+  + notifyObservers(String): void
+}
+
+interface Observer {
+  + update(String): void
+}
+
+class GestionnaireEmploiDuTemps {
+  - listeCours: List<ICours>
+  - observers: List<Observer>
+  + attach(Observer): void
+  + detach(Observer): void
+  + notifyObservers(String): void
+  + ajouterCours(ICours): void
+  + modifierCours(ICours, String): void
+  + setChangement(String): void
+}
+
+class Etudiant {
+  - nom: String
+  + Etudiant(String)
+  + update(String): void
+}
+
+class Responsable {
+  - nom: String
+  + Responsable(String)
+  + update(String): void
+}
+
+' Relations
+CoursBuilder ..> Cours : <<creates>>
+Cours ..|> ICours
+ICours <|.. CoursDecorator
+CoursDecorator <|-- CoursEnLigne
+CoursDecorator <|-- CoursEnAnglais
+CoursDecorator <|-- CoursMagistral
+CoursDecorator o-- ICours : decorates
+
+Subject <|.. GestionnaireEmploiDuTemps
+Observer <|.. Etudiant
+Observer <|.. Responsable
+GestionnaireEmploiDuTemps o-- Observer : observers
+GestionnaireEmploiDuTemps o-- ICours : listeCours
+
+note right of CoursBuilder
+  <b>Pattern: Builder</b>
+  Facilite la construction
+  d'objets complexes avec
+  une interface fluide
+end note
+
+note right of GestionnaireEmploiDuTemps
+  <b>Pattern: Observer</b>
+  Notifie automatiquement
+  tous les observateurs
+  lors de changements
+end note
+
+note right of CoursDecorator
+  <b>Pattern: Decorator</b>
+  Ajoute dynamiquement des
+  fonctionnalités aux cours
+  sans modifier leur structure
+end note
+
+@enduml
